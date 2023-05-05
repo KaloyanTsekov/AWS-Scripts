@@ -1,0 +1,72 @@
+Parameters:
+  AllocatedStorage:
+    Type: String
+    Default: '20'
+    Description: The amount of storage in gibibytes (GiB) to be initially allocated for the database instance. For gp2 storage size must be between 20 - 65536 (GiB), for io1 storage size must be between 100 - 65536 (GiB). Example '20'.
+  DBInstanceClass:
+    Type: String
+    Default: db.t3.micro
+    Description: Add instance class. Example 'db.t3.micro'
+  DBInstanceIdentifier:
+    Type: String
+    Description: Add the DB instance name - RDS name.
+  DBName:
+    Type: String
+    Description: Add the Name of the database, when the DB instance is created. 
+  DBUsername:
+    NoEcho: 'true'
+    Description: Username for MySQL database access.
+    Type: String
+    MinLength: '1'
+    MaxLength: '16'
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  DBPassword:
+    NoEcho: 'true'
+    Description: Password for MySQL database access.
+    Type: String
+    MinLength: '8'
+    MaxLength: '41'
+    AllowedPattern: '[a-zA-Z0-9]*'
+    ConstraintDescription: must contain only alphanumeric characters.
+  MaxAllocatedStorage:
+    Type: String
+    Default: '30'
+    Description: The upper limit in gibibytes (GiB) to which Amazon RDS can automatically scale the storage of the DB instance. Must be more than AllocatedStorage and up to 65536 (GiB). Example '30'.
+  StorageType:
+    Type: String
+    AllowedValues: ['gp2', 'io1']
+    Default: 'gp2'
+
+Resources:
+  KaloyanRDS:
+    Type: AWS::RDS::DBInstance
+    Properties: 
+      AllocatedStorage: !Ref AllocatedStorage
+      AllowMajorVersionUpgrade: False
+      AutoMinorVersionUpgrade: True
+      BackupRetentionPeriod: 7
+      CopyTagsToSnapshot: True
+      DBInstanceClass: !Ref DBInstanceClass
+      DBInstanceIdentifier: !Ref DBInstanceIdentifier
+      DBName: !Ref DBName
+      DeleteAutomatedBackups: True
+      DeletionProtection: False
+      EnableCloudwatchLogsExports: 
+        - audit
+      EnableIAMDatabaseAuthentication: True
+      Engine: MySQL
+      EngineVersion: '8.0.32'
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      MaxAllocatedStorage: !Ref MaxAllocatedStorage
+      MultiAZ: True
+      NetworkType: IPV4
+      PubliclyAccessible: True
+      StorageEncrypted: True
+      StorageType: !Ref StorageType
+      Tags: 
+        - Key: Environment
+          Value: Development
+        - Key: Engine
+          Value: MySQL
